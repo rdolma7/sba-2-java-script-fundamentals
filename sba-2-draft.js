@@ -84,7 +84,6 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
   let studentIds = learnerSubmissions.map((student) => {
     return student.learner_id;
   });
-
   console.log(studentIds);
   // generate the array from submissions data then make it unique -> [125,132]
   let uniqueArray = [];
@@ -105,10 +104,8 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
     let obj = {
       id: id,
     };
-    console.log(studentArray);
-    let assignments = learnerSubmissions.filter(
-      (submission) => id === submission.learner_id
-    );
+    // console.log(studentArray);
+    let assignments = learnerSubmissions.filter((submission) => id === submission.learner_id);
 
     assignments.forEach((element) => {
       let asssignmentId = element.assignment_id;
@@ -197,3 +194,8 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
 // const result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions);
 
 // console.log(result);
+
+
+// let maxScore= grade/
+
+// students.pupil[homework_id]= ''

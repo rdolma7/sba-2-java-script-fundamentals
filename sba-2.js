@@ -80,11 +80,7 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
   let studentIDs = learnerSubmissions.map((student) => {
     return student.learner_id;
   });
-  //   console.log(studentIDs);
-
-  // 1. first figure out who are the students ---LearnerSubmissions
-
-  // generate an array of unique students ids --- use map function on the learner submission array to create a copy.
+  // console.log(studentIDs);
 
   let uniqueIDs = [];
   for (let i = 0; i < studentIDs.length; i++) {
@@ -93,31 +89,62 @@ function getLearnerData(courseInfo, assignmentGroup, learnerSubmissions) {
       uniqueIDs.push(currentStudentId);
     }
   }
-  // console.log(uniqueIDs)
+  // console.log(uniqueIDs);
 
-  // 2. convert it into array of object where you have a key called id
-  // then value be studentid -> [{id:125},{id:132}]
-  //   3. get the assignments and calulcate the grade
-  // find the assignment for each student and thier score
-  // -> [{id:125,1:47,2:150,3:400},{id:132,1:32,2:140}]
-  let students = uniqueIDs.map((id) => {
+  let students = uniqueIDs.map((num) => {
+    //students is now the object with learner id from learner submissions as it's property and its value is set to the unique learner id.
     let obj = {
-      id: id,
+      id: num,
     };
     return obj;
   });
-  //   console.log(students);
-  learnerSubmissions.forEach((project) => {
-    let pupilId = project.learner_id; //unique student Id  ex: 125
-    let homework_id = project.assignment_id; //assignmentID
-    let grade = project.submission.score; //score of students
+  // console.log(students);
+  learnerSubmissions.forEach((id) => {
+    //id is the parameter that loops through each element inside learner submissions array.
+    let pupilId = id.learner_id; //id.learner_id is the learner_id elements inside learner submission.  ex: 125
+    let homeworkId = id.assignment_id; // id.assignment_id is the assignment_id elements inside learner submission. ex: 1.
+    // console.log(homeworkId)
+    let grade = id.submission.score; //score of students
     // let submittedTime = project.submission.submitted_at; //what time the assingment was submitted.
-    students.forEach((pupil) => {
-      // students ex:[ { id: 125 }, { id: 132 } ], pupil ex: { id: 125 }
-      if (pupil.id === pupilId) {
-        pupil[homework_id] = grade;
+    students.forEach((student) => {
+      // students ex:[ { id: 125, homeworkId:grade}, { id: 132 } ], pupil ex: { id: 125 }
+      if (student.id === pupilId) {
+        student[homeworkId] = grade; // this will create a new attribute in every student element when the condition is met.
       }
     });
+    // console.log(students);
   });
-  console.log(students)
+
+  // 4. we need to calculate the grade
+  // go every student and match assignment using id to find points points_possible
+  // you just divide the score by points points_possible
+  // -> [{id:125,1:0.94,2:1.0}]
+  // avg (add assignment scores together )/ (points possible)
+  // remove not due assignments
+
+  
+     // Loop through each student in the students array
+    students.forEach((student) => {
+        // Initialize variables to calculate average score
+        let avgScoreForAllAssignments = 0;
+        let numberOfAssignments = 0;
+        // Loop through each assignment in the assignment group
+        assignmentGroup.assignments.forEach((assignment) => {
+            let id = assignment.id;
+            let studentScore = student[id];
+            // Check if the student has a numeric score for this assignment
+            if (typeof studentScore === 'number') {
+                // Convert raw score to percentage of max possible points
+                let assignmentMaxScore = assignment.points_possible;
+                const percentage = studentScore / assignmentMaxScore;
+                student[id] = percentage.toFixed(2);
+                // Add to total and count assignments
+                avgScoreForAllAssignments += percentage;
+                numberOfAssignments++;
+            }
+        })
+        // Calculate and store the average score across all assignments for this student
+        student.avg = (avgScoreForAllAssignments / numberOfAssignments).toFixed(3);
+    })
+    console.log(students)
 }
